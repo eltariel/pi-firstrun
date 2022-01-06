@@ -12,7 +12,7 @@ It does the following:
 - Sets the system timezone and keyboard config
 - Renames the `pi` user and sets a password
 - Sets the SSH server to only accept pubkey auth, and installs a list of authorized keys for the new user
-- Cleans up after itself, leaving output in `/boot/firstrun.log`
+- Cleans up after itself, leaving output in `/boot/customise.log`
 
 
 # Compatibility
@@ -25,6 +25,7 @@ variants of bullseye as well.
 
 ## Automagic
 
+- Make a copy of the `conf.sample` directory called `conf` and update all of the files in there.
 - Run `./patch-img.sh`. Note this step is linux only - use a VM if you're on windows or macos.
 - Write the image to your SD card:
   - linux: `dd if=<image file>.img of=/dev/<sd card device> bs=4M status=progress`
