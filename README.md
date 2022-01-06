@@ -23,14 +23,27 @@ variants of bullseye as well.
 
 # Usage
 
-* Write an image to your SD card
-* Make a copy of the `conf.sample` directory called `conf` and update all of the files in there.
-* Copy `conf` and `firstrun.sh` to the root of the SD card.
-* Insert the SD into the Pi and wait.
+## Automagic
+
+- Run `./patch-img.sh`. Note this step is linux only - use a VM if you're on windows or macos.
+- Write the image to your SD card:
+  - linux: `dd if=<image file>.img of=/dev/<sd card device> bs=4M status=progress`
+  - macos: `./flash-macos.sh <image file>.img /dev/rdisk<n>` where <n> is the disk number for your SD card.
+  - Windows: TBD
+- Insert the SD into the Pi and wait.
+
+
+## Manual (don't do this)
+
+- Write a *customised* image to your SD card with the Raspberry Pi Imager
+- Make a copy of the `conf.sample` directory called `conf` and update all of the files in there.
+- Copy `conf` and `customise.sh` to the root of the SD card.
+- Change `firstrun.sh` to `customise.sh` in `cmdline.txt`.
+- Insert the SD into the Pi and wait.
 
 
 # TODO:
-[ ] Better config
-[ ] Script to flash the SD and copy the cfg in one hit
-[ ] Support Pi's without ethernet (zero, zero W, zero 2, 3A)
-[ ] Set device locale
+[] Better config
+[] Script to flash the SD and copy the cfg in one hit
+[] Support Pi's without ethernet (zero, zero W, zero 2, 3A)
+[] Set device locale

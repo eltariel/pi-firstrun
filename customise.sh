@@ -61,7 +61,7 @@ function setup_locale() {
 
 function cleanup_config() {
   sed -i 's| systemd.run.*||g' "/boot/cmdline.txt"
-  rm -f "/boot/firstrun.sh"
+  rm -f "/boot/customise.sh"
   rm -rf "${CONF_DIR}"
 }
 
@@ -74,6 +74,6 @@ function do_config() {
   cleanup_config
 }
 
-do_config 2>&1 | tee /boot/firstrun.log
+do_config 2>&1 | tee /boot/customise.log
 exit 0
 
