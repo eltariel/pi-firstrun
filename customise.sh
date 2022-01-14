@@ -8,6 +8,20 @@ CONF_DIR=/boot/conf
 . "${CONF_DIR}/vars.sh"
 # END CONFIG
 
+function update_config_txt() {
+  if grep -q 'arm_64bit' /boot/config.txt
+  then
+    sed -i "s/arm_64bit=.*/arm_64bit=${ARM64}/" /boot/config.txt
+  else
+    echo "arm_64bit=${ARM64}" >> /boot/config.txt
+  fi
+}
+
+function update_firmware() {
+  sed -i "s/default/${FIRMWARE_VERSION}/" /etc/default/rpi-eeprom-update
+  rpi-eeprom-update -a
+}
+
 function rename_pi_user() {
   usermod -l ${NEW_USER} -m -d "/home/${NEW_USER}" ${OLD_USER}
   groupmod -n ${NEW_USER} ${OLD_USER}
@@ -18,6 +32,13 @@ function rename_pi_user() {
   echo "${NEW_USER} ALL=(ALL) NOPASSWD: ALL" > "/etc/sudoers.d/010_${NEW_USER}-nopasswd"
 }
 
+function get_mac() {
+	IFACE=${1:?"Need an interface"}
+	ADDR_FILE=/sys/class/net/${IFACE}/address
+	[[ -f "${ADDR_FILE}" ]] && ADDR=$(<"${ADDR_FILE}")
+	[[ -n "${ADDR}" ]] && echo ${ADDR^^}
+}
+
 function update_hostname() {
   declare -A HOSTS
   while IFS=',' read MAC NAME
@@ -25,8 +46,9 @@ function update_hostname() {
     HOSTS[${MAC^^}]=${NAME}
   done < "${CONF_DIR}/hostnames"
 
-  MYMAC=$(</sys/class/net/eth0/address)
-  NEW_HOSTNAME=${HOSTS[${MYMAC^^}]}
+  MYMAC=$(get_mac eth0 || get_mac wlan0)
+
+  NEW_HOSTNAME=${HOSTS[${MYMAC}]:-${DEFAULT_HOSTNAME}}
 
   CURRENT_HOSTNAME=`cat "/etc/hostname" | tr -d " \t\n\r"`
 
@@ -66,6 +88,8 @@ function cleanup_config() {
 }
 
 function do_config() {
+  update_config_txt
+  update_firmware
   rename_pi_user
   update_hostname
   setup_ssh
